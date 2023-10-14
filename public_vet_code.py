@@ -63,7 +63,7 @@ def get_most_likely_diagnosis(gpt4_output, vet_notes):
 if __name__ == "__main__":
     print("Starting program...")
     # Read the vet's notes (you can replace this with actual input)
-    vet_notes = "Bella, a female Labrador Retriever, was brought in for a checkup due to several concerning symptoms reported by her owner, Mr. Smith. Bella has been displaying signs of lethargy, decreased appetite, excessive thirst, and increased urination over the past week. Additionally, Mr. Smith noted that Bella has been scratching her ears more than usual, which raises concerns about possible ear discomfort or infection. During the examination, Bella also showed signs of mild discomfort when her ears were touched. Further diagnostic tests will be necessary to determine the underlying cause of these symptoms."
+    vet_notes = input("Please enter the vet's notes: ")
 
     # Query GPT-4 for initial analysis, asking explicitly for relevant diagnostic category filenames
     specific_prompt = f"As a clinical vet, list only the 1 most relevant filename of the diagnostic categories that should be examined for a case with the following symptoms: {vet_notes}. For example, if Traumatic injuries should be considered, list 'Traumatic_episode_finding.csv'."
