@@ -1,0 +1,91 @@
+import pandas as pd
+import openai
+from collections import Counter
+import time
+
+# Initialize the GPT-4 API (replace YOUR_API_KEY_HERE with your actual API key)
+import os
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+
+def query_gpt4(prompt, acceptable_filenames=None):
+    while True:
+        try:
+            print("Querying GPT-4...")
+            model_engine = "gpt-4"
+            
+            # Update prompt to include acceptable filenames if provided
+            if acceptable_filenames:
+                prompt += f"\nPlease choose from the following existing filenames: {', '.join(acceptable_filenames)}."
+            print(prompt)
+            response = openai.ChatCompletion.create(
+
+                model=model_engine,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            print("Received response from GPT-4.")
+            print("GPT-4 output: ", response['choices'][0]['message']['content'].strip())
+            return response['choices'][0]['message']['content'].strip()
+        except openai.error.RateLimitError:
+            print(f"Rate limit reached. Retrying in 5 seconds.")
+            time.sleep(5)
+
+
+def get_relevant_categories(gpt4_output):
+    print("Getting relevant categories...")
+    unique_categories_df = pd.read_csv("unique_categories.csv")
+    unique_categories = unique_categories_df['Category Names'].tolist()
+    tokens = gpt4_output.split()
+    relevant_categories = [cat for cat in unique_categories if any(token.lower() in cat.lower() for token in tokens)]
+    print("Relevant categories obtained.")
+    return relevant_categories
+
+
+# Updated function: get_most_likely_diagnosis
+def get_most_likely_diagnosis(gpt4_output, vet_notes):
+    print("Getting most likely diagnosis...")
+    findings_data = []
+    
+    # Extract the filename from the GPT-4 output
+    filename = gpt4_output.strip("'")
+    sanitized_filename = filename.replace('.csv', '')
+    
+    try:
+        category_df = pd.read_csv(f"C:\\Users\\leofe\\Test Code\\Test Luke\\category_csvs\\{sanitized_filename}.csv")
+        # Inside the try block
+        #print(f"Debug: Successfully read {sanitized_filename}.csv")  # Existing debug line
+        #print(f"Debug: Number of rows: {len(category_df)}")  # New debug line
+        #print(f"Debug: Columns: {category_df.columns.tolist()}")  # New debug line
+        #print(f"Debug: DataFrame content:\n{category_df.head()}")  # Existing debug line
+
+        relevant_column = category_df.columns[0]
+        findings_data.extend(category_df[relevant_column].tolist())
+    except FileNotFoundError:
+        print(f"Debug: {sanitized_filename}.csv not found.")  # Debugging output
+    
+    print(f"Debug: findings_data = {findings_data}")  # Debugging output
+    
+    # Convert findings to a natural language string
+    findings_text = ", ".join(findings_data[:-1]) + " and " + findings_data[-1] if findings_data else "No findings available"
+    
+    prompt = f"You are a professional clinical vet with decades of experience, you are always correct in your findings. Given the following list of specific potential observed findings from other cases: {findings_text}, and the vet's notes for this specific case: {vet_notes}, could you provide a most likely diagnosis?"
+    diagnosis = query_gpt4(prompt)
+    print("Most likely diagnosis obtained.")
+    return diagnosis
+
+if __name__ == "__main__":
+    print("Starting program...")
+    # Read the vet's notes (you can replace this with actual input)
+    vet_notes = "Bella, a female Labrador Retriever, was brought in for a checkup due to several concerning symptoms reported by her owner, Mr. Smith. Bella has been displaying signs of lethargy, decreased appetite, excessive thirst, and increased urination over the past week. Additionally, Mr. Smith noted that Bella has been scratching her ears more than usual, which raises concerns about possible ear discomfort or infection. During the examination, Bella also showed signs of mild discomfort when her ears were touched. Further diagnostic tests will be necessary to determine the underlying cause of these symptoms."
+
+    # Query GPT-4 for initial analysis, asking explicitly for relevant diagnostic category filenames
+    specific_prompt = f"As a clinical vet, list only the 1 most relevant filename of the diagnostic categories that should be examined for a case with the following symptoms: {vet_notes}. For example, if Traumatic injuries should be considered, list 'Traumatic_episode_finding.csv'."
+    unique_categories_df = pd.read_csv("unique_categories.csv")
+    acceptable_filenames = unique_categories_df['Category Names'].tolist()
+    gpt4_output = query_gpt4(specific_prompt, acceptable_filenames)
+    diagnosis = get_most_likely_diagnosis(gpt4_output, vet_notes)
+    print(f"The most likely diagnosis is: {diagnosis}")
+    print("Program ended.")
