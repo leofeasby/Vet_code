@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vet Diagnosis</title>
+</head>
+<body>
+    <form method="post">
+        Vet notes: <input type="text" name="vet_notes">
+        <input type="submit" value="Get Diagnosis">
+    </form>
+
+    {% if diagnosis %}
+    <p>The most likely diagnosis is: {{ diagnosis }}</p>
+    {% endif %}
+</body>
+</html>
