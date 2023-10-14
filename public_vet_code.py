@@ -63,8 +63,7 @@ def get_most_likely_diagnosis(gpt4_output, vet_notes):
 if __name__ == "__main__":
     print("Starting program...")
     # Read the vet's notes (you can replace this with actual input)
-    vet_notes = input("Please enter the vet's notes: ")
-
+    vet_notes = os.environ.get("VET_NOTES", "Default vet notes if environment variable is not set")
     # Query GPT-4 for initial analysis, asking explicitly for relevant diagnostic category filenames
     specific_prompt = f"As a clinical vet, list only the 1 most relevant filename of the diagnostic categories that should be examined for a case with the following symptoms: {vet_notes}. For example, if Traumatic injuries should be considered, list 'Traumatic_episode_finding.csv'."
     unique_categories_df = pd.read_csv("unique_categories.csv")
