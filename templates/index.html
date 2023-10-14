@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vet Diagnosis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background: #50b3a2;
+            color: white;
+            padding: 1em;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 1em;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.5em;
+            margin-bottom: 1em;
+        }
+        input[type="submit"] {
+            background: #50b3a2;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+        input[type="submit"]:hover {
+            background: #39937e;
+        }
+        p {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Vetinary Diagnosis AI Assistant</h1>
+    </header>
+    <div class="container">
+        <form method="post">
+            <label for="vet_notes">Vet notes:</label>
+            <input type="text" id="vet_notes" name="vet_notes">
+            <input type="submit" value="Get Diagnosis">
+        </form>
+
+        {% if diagnosis %}
+        <p>The most likely diagnosis is: {{ diagnosis }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
