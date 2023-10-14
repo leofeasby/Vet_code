@@ -60,7 +60,7 @@ def get_most_likely_diagnosis(gpt4_output, vet_notes):
     diagnosis = query_gpt4(prompt)
     return diagnosis
 
-if __name__ == "__main__":
+def main(vet_notes):
     print("Starting program...")
     # Read the vet's notes (you can replace this with actual input)
     vet_notes = os.environ.get("VET_NOTES", "Default vet notes if environment variable is not set")
